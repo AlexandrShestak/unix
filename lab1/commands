@@ -1,0 +1,11 @@
+dd if=/dev/zero of=matryoshka bs=512M count=1
+mke2fs -t ext2 matryoshka
+sudo mount -t ext2 -o rw,loop matryoshka /mnt
+cd /mnt
+sudo touch file1
+sudo mkdir dir1
+cd dir1
+sudo touch file2
+cd /
+sudo umount /mnt
+
