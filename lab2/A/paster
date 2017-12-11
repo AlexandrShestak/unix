@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ] ; then
+ echo "Usage: $(basename "$0") file_name"
+ echo "It will take file content from stdin or file content (from file whose name was passes as argument to script) and send it to paste.ee website. As result link to paste.ee with text snippet will be printed and browser with this link will be opened"
+ exit
+fi 
+
+if [ "$#" -eq 1 ] && ! [ -f "$1" ] ; then
+ echo "File with name  $1 is not found" >&2
+ exit 1
+elif [ "$#" -gt 1 ]; then
+ echo "Script expects no more then one parameter" >&2
+ exit 1
+fi
+
+if [ $# -eq 0 ] ; then
+ snippet=$(cat)
+else
+ snippet="$(cat "$@")"
+fi
+
+paste_url="$(jq -n --arg content "$snippet"\
+ '{description:"unixLab",sections:[{name:"Section",contents:$content}]}'\
+ | curl "https://api.paste.ee/v1/pastes"\
+ -X "POST"\
+ -H "Content-Type: application/json"\
+ -H "X-Auth-Token: uGotJaAAOQUCM5asTV6mF5Yd4bJnTJEXZt3HJCL0j"\
+ -d@- | grep -o -P '(?<=link":").*(?=","success)' | tr -d '\')"
+
+echo "$paste_url"
+xdg-open "$paste_url"

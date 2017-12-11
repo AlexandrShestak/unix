@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [ ! -f ${HOME}/.alldirs ]; then
+  echo "You should call updalldirs before." >&2
+  exit 1    
+fi
+
+grep --color=always "$1" ${HOME}/.alldirs
