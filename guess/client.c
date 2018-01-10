@@ -56,10 +56,11 @@ int main(int argc, char* argv[]) {
     printf("Connected.\n");
 
 
-    char number[100];
+    int low = 0;
+    int max = 1000000000;
     while (true) {
-        fgets(number, 100, stdin);
-        uint32_t number_to_send = (unsigned int)ntohl(atoi(number));
+        int number = (low + max) /2;
+        uint32_t number_to_send = (unsigned int)ntohl(number);
         if (!SendAll(fd, (char*) &number_to_send, sizeof(number_to_send))) {
             break;
         }
@@ -68,12 +69,16 @@ int main(int argc, char* argv[]) {
             break;
         }
 
+        fprintf(stderr, "%c \n", sign[0]);
         if (sign[0] == '=') {
             close(fd);
-            printf("%s \n", number);
+            printf("%d \n", number);
             return 0;
+        } else if (sign[0] == '>') {
+            low = number + 1;
+        } else {
+            max = number;
         }
-        fprintf(stderr, "%c \n", sign[0]);
     }
 
     close(fd);
